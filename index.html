@@ -11,192 +11,103 @@
             --marble-border: #d4af37;
             --deep-gold: #c59b27;
             --dark-stone: #2c2c2c;
+            --accent-red: #8b0000;
+            --accent-green: #2e7d32;
         }
         body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Roboto', sans-serif;
-            background-color: #1a1a1a;
-            color: var(--dark-stone);
-            overflow: hidden;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
+            margin: 0; padding: 0; font-family: 'Roboto', sans-serif;
+            background-color: #1a1a1a; color: var(--dark-stone);
+            overflow: hidden; height: 100vh; display: flex; flex-direction: column;
         }
+
+        /* LOBBY */
         #lobby-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh;
             background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1608245438235-b639e6a14352?auto=format&fit=crop&w=1920&q=80') no-repeat center center/cover;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+            display: flex; justify-content: center; align-items: center; z-index: 1000;
         }
         .olympic-card {
-            background: var(--marble-bg);
-            border: 4px solid var(--marble-border);
-            border-radius: 8px;
-            padding: 40px;
-            width: 450px;
-            text-align: center;
+            background: var(--marble-bg); border: 4px solid var(--marble-border);
+            border-radius: 8px; padding: 25px 40px; width: 450px; text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
         .olympic-card h1 {
-            font-family: 'Cinzel', serif;
-            color: var(--dark-stone);
-            font-size: 28px;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            font-family: 'Cinzel', serif; color: var(--dark-stone); font-size: 26px; margin-bottom: 5px; text-transform: uppercase;
         }
         .olympic-card p {
-            font-family: 'IM Fell English SC', serif;
-            font-size: 18px;
-            color: #555;
-            margin-bottom: 25px;
+            font-family: 'IM Fell English SC', serif; font-size: 16px; color: #555; margin-bottom: 15px;
         }
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
+        .input-group { margin-bottom: 12px; text-align: left; }
         .input-group label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-            font-size: 14px;
-            font-family: 'Cinzel', serif;
+            display: block; font-weight: bold; margin-bottom: 3px; font-size: 13px; font-family: 'Cinzel', serif;
         }
         .input-group input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid var(--marble-border);
-            border-radius: 4px;
-            background: #fff;
-            font-size: 16px;
-            box-sizing: border-box;
+            width: 100%; padding: 10px; border: 2px solid var(--marble-border); border-radius: 4px; box-sizing: border-box; font-size: 15px;
         }
         .btn-olympic {
             background: linear-gradient(to bottom, #d4af37, #aa820a);
-            color: #fff;
-            border: 2px solid #fff;
-            padding: 14px 20px;
-            font-size: 18px;
-            font-family: 'Cinzel', serif;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 100%;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            color: #fff; border: 2px solid #fff; padding: 12px 20px;
+            font-size: 16px; font-family: 'Cinzel', serif; font-weight: bold;
+            border-radius: 4px; cursor: pointer; width: 100%; text-transform: uppercase;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.2s; margin-top: 5px;
         }
-        .btn-olympic:hover {
-            background: linear-gradient(to bottom, #e6c555, #c59b27);
-        }
-        #game-screen {
-            display: none;
-            width: 100vw;
-            height: 100vh;
-            flex-direction: row;
-        }
+        .btn-olympic:hover { background: linear-gradient(to bottom, #e6c555, #c59b27); }
+        .btn-stop { background: linear-gradient(to bottom, #a32a2a, #6e1313); margin-top: 10px; }
+        .btn-stop:hover { background: linear-gradient(to bottom, #c43838, #8b1a1a); }
+
+        /* MAIN GAME */
+        #game-screen { display: none; width: 100vw; height: 100vh; flex-direction: row; }
         #sidebar {
-            width: 380px;
-            background: var(--marble-bg);
-            border-right: 4px solid var(--marble-border);
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-            box-sizing: border-box;
-            z-index: 10;
-            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+            width: 380px; background: var(--marble-bg); border-right: 4px solid var(--marble-border);
+            display: flex; flex-direction: column; padding: 20px; box-sizing: border-box; z-index: 10;
         }
-        .sidebar-header {
-            text-align: center;
-            border-bottom: 2px solid var(--marble-border);
-            padding-bottom: 15px;
-            margin-bottom: 15px;
-        }
-        .sidebar-header h2 {
-            font-family: 'Cinzel', serif;
-            margin: 0;
-            font-size: 22px;
-            color: var(--dark-stone);
-        }
+        .sidebar-header { text-align: center; border-bottom: 2px solid var(--marble-border); padding-bottom: 10px; margin-bottom: 10px; }
+        .sidebar-header h2 { font-family: 'Cinzel', serif; margin: 0; font-size: 20px; }
         .timer-box {
-            background: #2c2c2c;
-            color: #d4af37;
-            font-family: 'Cinzel', serif;
-            font-size: 28px;
-            font-weight: bold;
-            text-align: center;
-            padding: 10px;
-            border-radius: 4px;
-            border: 2px solid var(--marble-border);
-            margin-bottom: 15px;
-            letter-spacing: 2px;
+            background: #2c2c2c; color: #d4af37; font-family: 'Cinzel', serif;
+            font-size: 26px; font-weight: bold; text-align: center; padding: 8px;
+            border-radius: 4px; border: 2px solid var(--marble-border); margin-bottom: 10px;
         }
-        .bingo-list-container {
-            flex-grow: 1;
-            overflow-y: auto;
-            margin-bottom: 15px;
-            padding-right: 5px;
-        }
+        .bingo-list-container { flex-grow: 1; overflow-y: auto; margin-bottom: 10px; }
         .bingo-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #fff;
-            border: 1px solid #ccc;
-            padding: 10px 12px;
-            margin-bottom: 8px;
-            border-radius: 4px;
-            cursor: pointer;
+            display: flex; align-items: center; justify-content: space-between;
+            background: #fff; border: 1px solid #ccc; padding: 8px 12px; margin-bottom: 6px; border-radius: 4px; cursor: pointer;
         }
-        .bingo-item:hover {
-            border-color: var(--deep-gold);
-            background: #fffdf0;
-        }
-        .bingo-item.checked {
-            background: #e8f5e9;
-            border-color: #4caf50;
-            text-decoration: line-through;
-            color: #555;
-        }
-        #content-area {
-            flex-grow: 1;
-            position: relative;
-            height: 100vh;
-        }
-        #street-view {
-            width: 100%;
-            height: 100%;
-        }
+        .bingo-item.checked { background: #e8f5e9; border-color: #4caf50; text-decoration: line-through; color: #555; }
+        #content-area { flex-grow: 1; position: relative; height: 100vh; }
+        #street-view { width: 100%; height: 100%; }
         #mini-map {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            width: 280px;
-            height: 200px;
-            border: 3px solid var(--marble-border);
-            border-radius: 6px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            z-index: 5;
-            background: #fff;
+            position: absolute; bottom: 20px; right: 20px; width: 280px; height: 200px;
+            border: 3px solid var(--marble-border); border-radius: 6px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); z-index: 5; background: #fff;
         }
-        .torch-icon {
-            font-size: 24px;
-            margin-bottom: 5px;
-            display: inline-block;
+
+        /* MODALS (Voting & Ergebnisse) */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.85); display: none; justify-content: center; align-items: center; z-index: 2000;
         }
+        .vote-card {
+            background: var(--marble-bg); border: 4px solid var(--marble-border);
+            border-radius: 8px; padding: 30px; width: 500px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+        }
+        .vote-card h2 { font-family: 'Cinzel', serif; color: var(--dark-stone); margin-top: 0; }
+        .vote-actions { display: flex; gap: 15px; margin-top: 20px; }
+        .btn-accept { background: var(--accent-green); color: white; border: none; padding: 12px; flex: 1; border-radius: 4px; font-weight: bold; cursor: pointer; font-family: 'Cinzel', serif; font-size: 16px; }
+        .btn-reject { background: var(--accent-red); color: white; border: none; padding: 12px; flex: 1; border-radius: 4px; font-weight: bold; cursor: pointer; font-family: 'Cinzel', serif; font-size: 16px; }
+        
+        .podium-list { list-style: none; padding: 0; margin: 20px 0; text-align: left; }
+        .podium-item { background: #fff; border: 2px solid var(--marble-border); margin-bottom: 10px; padding: 12px 15px; border-radius: 6px; font-family: 'Cinzel', serif; font-size: 18px; display: flex; justify-content: space-between; }
+        .podium-item.first { background: #fff8e1; border-color: #ffd700; font-weight: bold; }
+        .podium-item.second { background: #f5f5f5; border-color: #c0c0c0; }
+        .podium-item.third { background: #efebe9; border-color: #cd7f32; }
     </style>
 </head>
 <body>
+
+    <!-- LOBBY SCREEN -->
     <div id="lobby-screen">
         <div class="olympic-card">
-            <div class="torch-icon">🔥</div>
+            <div style="font-size:28px;">🔥</div>
             <h1>Geo Bingo</h1>
             <p>Olympische Edition</p>
             <div class="input-group">
@@ -204,42 +115,104 @@
                 <input type="text" id="player-name" placeholder="z.B. Herkules">
             </div>
             <div class="input-group">
-                <label for="room-code">Raum-Code:</label>
+                <label for="room-code">Raum-Code (teilen mit Freunden!):</label>
                 <input type="text" id="room-code" value="Olympia-1">
+            </div>
+            <div class="input-group">
+                <label for="game-time">Spieldauer (in Minuten):</label>
+                <input type="number" id="game-time" value="1" min="1" max="120">
             </div>
             <button class="btn-olympic" onclick="startGame()">Wettkampf Starten</button>
         </div>
     </div>
 
+    <!-- MAIN GAME SCREEN -->
     <div id="game-screen">
         <div id="sidebar">
             <div class="sidebar-header">
-                <h2>Such-Liste</h2>
+                <h2 id="sidebar-title">Such-Liste</h2>
             </div>
-            <div class="timer-box" id="timer-display">30:00</div>
+            <div class="timer-box" id="timer-display">01:00</div>
             <div class="bingo-list-container" id="bingo-list"></div>
-            <p style="font-size: 12px; color: #666; text-align: center; margin: 0;">
-                Klicke auf ein Element, um deinen Fund zu speichern!
-            </p>
+            
+            <button class="btn-olympic btn-stop" onclick="finishSearchPhase()">Runde vorzeitig beenden</button>
         </div>
+
         <div id="content-area">
             <div id="street-view"></div>
             <div id="mini-map"></div>
         </div>
     </div>
 
+    <!-- VOTING MODAL -->
+    <div class="modal-overlay" id="voting-modal">
+        <div class="vote-card">
+            <h2>Olympisches Schiedsgericht</h2>
+            <p id="vote-info-text">Prüfung des Fundes...</p>
+            <div style="background:#eee; padding: 20px; border-radius: 6px; font-weight: bold; font-size: 20px; margin: 15px 0;" id="vote-item-name">
+                Element Name
+            </div>
+            <p style="font-size:14px; color:#666;">Ist der Gegenstand korrekt erkannt worden?</p>
+            <div class="vote-actions">
+                <button class="btn-accept" onclick="castVote(true)">✓ Akzeptieren (+1 Pt)</button>
+                <button class="btn-reject" onclick="castVote(false)">✕ Ablehnen (0 Pt)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ERGEBNIS / PODEST MODAL -->
+    <div class="modal-overlay" id="result-modal">
+        <div class="vote-card">
+            <h2>🏆 Siegerehrung 🏆</h2>
+            <p>Die Olympischen Spiele sind beendet!</p>
+            
+            <div class="podium-list" id="podium-container">
+                <!-- Ergebnisliste wird dynamisch erzeugt -->
+            </div>
+
+            <button class="btn-olympic" onclick="location.reload()">Neues Spiel starten</button>
+        </div>
+    </div>
+
+    <!-- Google Maps API mit deinem persönlichen Schlüssel -->
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCvTgGtBjZacuAbXZ24oUyqOsvJExeQN38&libraries=places"></script>
     
     <script>
         let streetViewPanorama, miniMap, marker, gameTimer;
-        let timeLeft = 30 * 60;
-        const defaultItems = ["Krankenwagen", "Rollstuhlfahrer", "Roter Bus", "Brunnen", "Fahrradfahrer", "Polizeiauto", "Baustelle", "Postauto", "Kreisverkehr"];
+        let timeLeft = 60;
+        let checkedItems = [];
+        
+        // Multiplayer / Voting Verwaltung über localStorage (gemeinsamer Raum)
+        let roomCode = "Olympia-1";
+        let playerName = "";
+        let allPlayersSubmissions = []; // Liste aller Spieler und ihrer Funde
+        let currentVoteIndex = 0;
+        let currentVotePlayer = "";
+
+        const defaultItems = [
+            "Krankenwagen", "Rollstuhlfahrer", "Roter Bus", 
+            "Brunnen", "Fahrradfahrer", "Polizeiauto", 
+            "Baustelle", "Postauto", "Kreisverkehr"
+        ];
 
         function startGame() {
-            const name = document.getElementById('player-name').value.trim();
-            if(!name) { alert("Bitte gib deinen Namen ein!"); return; }
+            playerName = document.getElementById('player-name').value.trim();
+            if(!playerName) { alert("Bitte gib deinen Namen ein!"); return; }
+
+            roomCode = document.getElementById('room-code').value.trim() || "Olympia-1";
+
+            const inputMinutes = parseInt(document.getElementById('game-time').value);
+            if(isNaN(inputMinutes) || inputMinutes <= 0) {
+                alert("Bitte gib eine gültige Minutenanzahl ein!");
+                return;
+            }
+
+            timeLeft = inputMinutes * 60;
+
             document.getElementById('lobby-screen').style.display = 'none';
             document.getElementById('game-screen').style.display = 'flex';
+            document.getElementById('sidebar-title').textContent = `Such-Liste (${playerName})`;
+
             initMapAndStreetView();
             initBingoList();
             startTimer();
@@ -247,27 +220,27 @@
 
         function initMapAndStreetView() {
             const startLocation = { lat: 52.5162, lng: 13.3777 };
+
             streetViewPanorama = new google.maps.StreetViewPanorama(
                 document.getElementById('street-view'), {
                     position: startLocation,
                     pov: { heading: 34, pitch: 10 },
-                    zoomControl: true,
-                    addressControl: true,
-                    fullscreenControl: true
+                    zoomControl: true, addressControl: true, fullscreenControl: true
                 }
             );
+
             miniMap = new google.maps.Map(document.getElementById('mini-map'), {
-                center: startLocation,
-                zoom: 14,
-                streetViewControl: false,
-                mapTypeControl: false
+                center: startLocation, zoom: 14, streetViewControl: false, mapTypeControl: false
             });
+
             marker = new google.maps.Marker({ position: startLocation, map: miniMap, title: "Dein Standort" });
+
             streetViewPanorama.addListener('position_changed', function() {
                 const pos = streetViewPanorama.getPosition();
                 miniMap.setCenter(pos);
                 marker.setPosition(pos);
             });
+
             miniMap.addListener('click', function(mapsMouseEvent) {
                 streetViewPanorama.setPosition(mapsMouseEvent.latLng);
             });
@@ -276,26 +249,134 @@
         function initBingoList() {
             const listContainer = document.getElementById('bingo-list');
             listContainer.innerHTML = '';
-            defaultItems.forEach((itemText, index) => {
+
+            defaultItems.forEach((itemText) => {
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'bingo-item';
-                itemDiv.innerHTML = `<span>${index + 1}. ${itemText}</span><input type="checkbox" style="pointer-events: none;">`;
+                itemDiv.innerHTML = `<span>${itemText}</span><input type="checkbox" style="pointer-events: none;">`;
+                
                 itemDiv.onclick = function() {
                     itemDiv.classList.toggle('checked');
-                    itemDiv.querySelector('input').checked = !itemDiv.querySelector('input').checked;
+                    const checkbox = itemDiv.querySelector('input');
+                    checkbox.checked = !checkbox.checked;
+
+                    if(checkbox.checked) {
+                        if(!checkedItems.includes(itemText)) checkedItems.push(itemText);
+                    } else {
+                        checkedItems = checkedItems.filter(i => i !== itemText);
+                    }
                 };
+
                 listContainer.appendChild(itemDiv);
             });
         }
 
         function startTimer() {
             const display = document.getElementById('timer-display');
+            updateTimerDisplay(display);
+
             gameTimer = setInterval(() => {
-                let minutes = Math.floor(timeLeft / 60);
-                let seconds = timeLeft % 60;
-                display.textContent = (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
-                if (--timeLeft < 0) { clearInterval(gameTimer); alert("Die Zeit ist abgelaufen!"); }
+                if (--timeLeft < 0) {
+                    clearInterval(gameTimer);
+                    alert("Die Zeit ist abgelaufen!");
+                    finishSearchPhase();
+                } else {
+                    updateTimerDisplay(display);
+                }
             }, 1000);
+        }
+
+        function updateTimerDisplay(display) {
+            let minutes = Math.floor(timeLeft / 60);
+            let seconds = timeLeft % 60;
+            display.textContent = (minutes < 10 ? "0" + minutes : minutes) + ":" + (seconds < 10 ? "0" + seconds : seconds);
+        }
+
+        /* RUNDE BEENDEN & SPEICHERN FÜR MULTIPLAYER */
+        function finishSearchPhase() {
+            clearInterval(gameTimer);
+
+            // Eigene Funde im Browser (localStorage) für den Raum speichern
+            const playerData = { name: playerName, items: [...checkedItems], points: 0 };
+            
+            let roomData = JSON.parse(localStorage.getItem('geo_bingo_' + roomCode) || '[]');
+            // Entferne alten Eintrag des Spielers falls vorhanden und füge neuen hinzu
+            roomData = roomData.filter(p => p.name !== playerName);
+            roomData.push(playerData);
+            localStorage.setItem('geo_bingo_' + roomCode, JSON.stringify(roomData));
+
+            // Wir holen alle Spielerdaten ab, die diesen Raum-Code genutzt haben
+            allPlayersSubmissions = [];
+            roomData.forEach(player => {
+                player.items.forEach(item => {
+                    allPlayersSubmissions.push({ player: player.name, item: item });
+                });
+            });
+
+            currentVoteIndex = 0;
+
+            if (allPlayersSubmissions.length === 0) {
+                showResults(roomData);
+            } else {
+                document.getElementById('voting-modal').style.display = 'flex';
+                showNextVoteItem();
+            }
+        }
+
+        /* REihE UM VOTING */
+        function showNextVoteItem() {
+            if (currentVoteIndex < allPlayersSubmissions.length) {
+                const sub = allPlayersSubmissions[currentVoteIndex];
+                document.getElementById('vote-info-text').textContent = `${sub.player} hat folgenden Fund gemeldet (${currentVoteIndex + 1}/${allPlayersSubmissions.length}):`;
+                document.getElementById('vote-item-name').textContent = sub.item;
+            } else {
+                document.getElementById('voting-modal').style.display = 'none';
+                
+                // Punkte auswerten und anzeigen
+                let roomData = JSON.parse(localStorage.getItem('geo_bingo_' + roomCode) || '[]');
+                showResults(roomData);
+            }
+        }
+
+        function castVote(accepted) {
+            if (accepted) {
+                const sub = allPlayersSubmissions[currentVoteIndex];
+                let roomData = JSON.parse(localStorage.getItem('geo_bingo_' + roomCode) || '[]');
+                const targetPlayer = roomData.find(p => p.name === sub.player);
+                if (targetPlayer) {
+                    targetPlayer.points = (targetPlayer.points || 0) + 1;
+                    localStorage.setItem('geo_bingo_' + roomCode, JSON.stringify(roomData));
+                }
+            }
+            currentVoteIndex++;
+            showNextVoteItem();
+        }
+
+        /* SIEGEREHRUNG (PODEST) */
+        function showResults(roomData) {
+            document.getElementById('result-modal').style.display = 'flex';
+
+            // Falls niemand mitgemacht hat, Dummy hinzufügen
+            if (!roomData || roomData.length === 0) {
+                roomData = [{ name: playerName, points: 0 }];
+            }
+
+            // Nach Punkten sortieren (Höchste Punktzahl zuerst)
+            roomData.sort((a, b) => (b.points || 0) - (a.points || 0));
+
+            const podiumContainer = document.getElementById('podium-container');
+            podiumContainer.innerHTML = '';
+
+            const classes = ['first', 'second', 'third'];
+            const medals = ['🥇 1. Platz', '🥈 2. Platz', '🥉 3. Platz'];
+
+            roomData.forEach((player, index) => {
+                const item = document.createElement('li');
+                item.className = `podium-item ${classes[index] || ''}`;
+                const medalText = medals[index] || `${index + 1}. Platz`;
+                item.innerHTML = `<span>${medalText} - ${player.name}</span> <span>${player.points || 0} Pt.</span>`;
+                podiumContainer.appendChild(item);
+            });
         }
     </script>
 </body>
