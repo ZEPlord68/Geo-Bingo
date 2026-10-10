@@ -28,18 +28,18 @@
         }
         .olympic-card {
             background: var(--marble-bg); border: 4px solid var(--marble-border);
-            border-radius: 8px; padding: 25px 40px; width: 480px; text-align: center;
+            border-radius: 8px; padding: 30px 40px; width: 450px; text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
         .olympic-card h1 {
             font-family: 'Cinzel', serif; color: var(--dark-stone); font-size: 26px; margin-bottom: 5px; text-transform: uppercase;
         }
         .olympic-card p {
-            font-family: 'IM Fell English SC', serif; font-size: 16px; color: #555; margin-bottom: 15px;
+            font-family: 'IM Fell English SC', serif; font-size: 16px; color: #555; margin-bottom: 20px;
         }
-        .input-group { margin-bottom: 12px; text-align: left; }
+        .input-group { margin-bottom: 15px; text-align: left; }
         .input-group label {
-            display: block; font-weight: bold; margin-bottom: 3px; font-size: 13px; font-family: 'Cinzel', serif;
+            display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; font-family: 'Cinzel', serif;
         }
         .input-group input {
             width: 100%; padding: 10px; border: 2px solid var(--marble-border); border-radius: 4px; box-sizing: border-box; font-size: 15px;
@@ -49,19 +49,19 @@
             color: #fff; border: 2px solid #fff; padding: 12px 20px;
             font-size: 16px; font-family: 'Cinzel', serif; font-weight: bold;
             border-radius: 4px; cursor: pointer; width: 100%; text-transform: uppercase;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.2s; margin-top: 5px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3); transition: 0.2s; margin-top: 10px;
         }
         .btn-olympic:hover { background: linear-gradient(to bottom, #e6c555, #c59b27); }
         .btn-stop { background: linear-gradient(to bottom, #a32a2a, #6e1313); margin-top: 10px; }
         .btn-stop:hover { background: linear-gradient(to bottom, #c43838, #8b1a1a); }
 
-        /* SPIELER-LISTE IN DER WARTEHALLE */
-        #waiting-room { display: none; }
+        /* WARTERAUM LISTEN BOX */
+        #waiting-room-section { display: none; }
         .player-list-box {
             background: #fff; border: 2px solid var(--marble-border); border-radius: 4px;
-            padding: 10px; max-height: 150px; overflow-y: auto; margin-bottom: 15px; text-align: left;
+            padding: 12px; max-height: 180px; overflow-y: auto; margin-bottom: 20px; text-align: left;
         }
-        .player-list-item { font-family: 'Cinzel', serif; padding: 5px 0; border-bottom: 1px dashed #eee; font-size: 15px; }
+        .player-list-item { font-family: 'Cinzel', serif; padding: 6px 0; border-bottom: 1px dashed #eee; font-size: 16px; font-weight: bold; }
 
         /* MAIN GAME */
         #game-screen { display: none; width: 100vw; height: 100vh; flex-direction: row; }
@@ -89,7 +89,7 @@
             border: 3px solid var(--marble-border); border-radius: 6px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); z-index: 5; background: #fff;
         }
 
-        /* SCHWEBENDES VOTING-PANEL (OBEN RECHTS ÜBER STREET VIEW) */
+        /* SCHWEBENDES SCHIEDSGERICHT (OBEN RECHTS ÜBER STREET VIEW) */
         #voting-panel {
             position: absolute; top: 20px; right: 20px; width: 340px;
             background: var(--marble-bg); border: 4px solid var(--marble-border);
@@ -121,15 +121,15 @@
 </head>
 <body>
 
-    <!-- LOBBY & WARTEHALLE -->
+    <!-- LOBBY & WARTERAUM -->
     <div id="lobby-screen">
         <div class="olympic-card">
             <div style="font-size:28px;">🔥</div>
             <h1>Geo Bingo</h1>
             <p>Olympische Edition</p>
 
-            <!-- Schritt 1: Raum betreten -->
-            <div id="room-join-section">
+            <!-- Schritt 1: Namen und Raum eingeben -->
+            <div id="room-input-section">
                 <div class="input-group">
                     <label for="player-name">Dein Name:</label>
                     <input type="text" id="player-name" placeholder="z.B. Herkules">
@@ -142,18 +142,23 @@
                     <label for="game-time">Spieldauer (Minuten):</label>
                     <input type="number" id="game-time" value="1" min="1" max="120">
                 </div>
-                <button class="btn-olympic" onclick="joinRoom()">Raum betreten</button>
+                <button class="btn-olympic" onclick="joinRoom()">Raum beitreten</button>
             </div>
 
-            <!-- Schritt 2: Warteraum (Sichtbar für alle beigetretenen Spieler) -->
-            <div id="waiting-room">
-                <p id="room-status-text" style="font-weight:bold; color:var(--deep-gold);">Warte auf Mitspieler...</p>
+            <!-- Schritt 2: Echte Spieler-Wartehalle -->
+            <div id="waiting-room-section">
+                <p id="room-status-message" style="font-weight:bold; color:var(--deep-gold); margin-bottom: 10px;">Raum betreten! Warte auf Mitspieler...</p>
+                
                 <div class="player-list-box" id="player-list-container">
-                    <!-- Live Spielerliste -->
+                    <!-- Hier erscheinen live alle beigetretenen Spieler -->
                 </div>
-                <div id="host-controls">
+
+                <div id="host-start-container" style="display:none;">
                     <button class="btn-olympic" onclick="hostStartGame()">Spiel für Alle Starten</button>
-                    <p style="font-size: 11px; color: #666; margin-top: 5px;">Als Host kannst du das Spiel starten, sobald alle da sind.</p>
+                    <p style="font-size: 11px; color: #666; margin-top: 5px;">Du bist Host. Starte, sobald alle da sind.</p>
+                </div>
+                <div id="guest-wait-container">
+                    <p style="font-size: 13px; color: #444; font-style: italic;">Warte darauf, dass der Host das Spiel startet...</p>
                 </div>
             </div>
         </div>
@@ -175,12 +180,12 @@
             <div id="street-view"></div>
             <div id="mini-map"></div>
 
-            <!-- SCHWEBENDES SCHIEDSGERICHT (ÜBER DER KARTE) -->
+            <!-- SCHWEBENDES SCHIEDSGERICHT (ERLAUBT FREIES UMSCHAUEN IN STREET VIEW) -->
             <div id="voting-panel">
                 <h3>🏛️ Schiedsgericht</h3>
                 <p id="vote-info-text" style="font-size:13px; margin:5px 0;">Spieler X hat gefunden:</p>
                 <div class="vote-item-display" id="vote-item-name">Gegenstand</div>
-                <p style="font-size:12px; color:#555; margin:0;">Schaut euch in Street View um, stimmt ab und klickt eure Entscheidung:</p>
+                <p style="font-size:12px; color:#555; margin:0;">Schaut euch in Street View um, stimmt ab:</p>
                 <div class="vote-actions">
                     <button class="btn-accept" onclick="castVote(true)">✓ Akzeptieren</button>
                     <button class="btn-reject" onclick="castVote(false)">✕ Ablehnen</button>
@@ -229,21 +234,21 @@
 
             roomCode = document.getElementById('room-code').value.trim() || "Olympia-1";
 
-            // UI umschalten auf Warteraum
-            document.getElementById('room-join-section').style.display = 'none';
-            document.getElementById('waiting-room').style.display = 'block';
+            // Ansicht auf Wartehalle umschalten
+            document.getElementById('room-input-section').style.display = 'none';
+            document.getElementById('waiting-room-section').style.display = 'block';
 
-            // Prüfen ob Host (erster Spieler im Raum oder Ersteller)
-            registerPlayerInLobby();
+            registerInLobby();
 
-            // Regelmäßig die Spielerliste und den Spielstart-Status abfragen
+            // Regelmäßig prüfen, ob neue Spieler beitreten oder das Spiel gestartet wurde
             lobbyPollTimer = setInterval(pollLobbyStatus, 1500);
         }
 
-        function registerPlayerInLobby() {
+        function registerInLobby() {
             let lobbyKey = 'geo_lobby_' + roomCode;
             let lobby = JSON.parse(localStorage.getItem(lobbyKey) || '{"host": "", "players": [], "gameStarted": false, "startTime": 0, "duration": 60}');
 
+            // Wenn noch kein Host existiert, wird der erste Spieler zum Host
             if (!lobby.host) {
                 lobby.host = playerName;
                 isHost = true;
@@ -257,7 +262,7 @@
                 lobby.players.push(playerName);
             }
 
-            // Dauer aktualisieren falls Host
+            // Dauer speichern falls Host
             if (isHost) {
                 const inputMinutes = parseInt(document.getElementById('game-time').value) || 1;
                 lobby.duration = inputMinutes * 60;
@@ -274,7 +279,7 @@
 
             updateWaitingRoomUI(lobby);
 
-            // Prüfen ob das Spiel gestartet wurde
+            // Wenn Host das Spiel gestartet hat -> für alle starten!
             if (lobby.gameStarted) {
                 clearInterval(lobbyPollTimer);
                 startActualGame(lobby.startTime, lobby.duration);
@@ -291,12 +296,14 @@
                 container.appendChild(div);
             });
 
-            if (!isHost) {
-                document.getElementById('host-controls').style.display = 'none';
-                document.getElementById('room-status-text').textContent = "Warte darauf, dass der Host das Spiel startet...";
+            if (isHost) {
+                document.getElementById('host-start-container').style.display = 'block';
+                document.getElementById('guest-wait-container').style.display = 'none';
+                document.getElementById('room-status-message').textContent = `Raum: ${roomCode} (Du bist Host)`;
             } else {
-                document.getElementById('host-controls').style.display = 'block';
-                document.getElementById('room-status-text').textContent = "Du bist Host. Sobald alle da sind, starte das Spiel!";
+                document.getElementById('host-start-container').style.display = 'none';
+                document.getElementById('guest-wait-container').style.display = 'block';
+                document.getElementById('room-status-message').textContent = `Raum: ${roomCode} - Verbunden!`;
             }
         }
 
@@ -315,7 +322,6 @@
             document.getElementById('game-screen').style.display = 'flex';
             document.getElementById('sidebar-title').textContent = `Such-Liste (${playerName})`;
 
-            // Restzeit berechnen basierend auf gemeinsamer Startzeit
             const elapsed = Math.floor((Date.now() - startTime) / 1000);
             timeLeft = Math.max(1, duration - elapsed);
 
@@ -402,14 +408,12 @@
         function finishSearchPhase() {
             clearInterval(gameTimer);
 
-            // Eigene Funde speichern
             const playerData = { name: playerName, items: [...checkedItems], points: 0 };
             let roomData = JSON.parse(localStorage.getItem('geo_bingo_results_' + roomCode) || '[]');
             roomData = roomData.filter(p => p.name !== playerName);
             roomData.push(playerData);
             localStorage.setItem('geo_bingo_results_' + roomCode, JSON.stringify(roomData));
 
-            // Alle Einreichungen für das Schiedsgericht sammeln
             allPlayersSubmissions = [];
             roomData.forEach(player => {
                 player.items.forEach(item => {
@@ -422,7 +426,6 @@
             if (allPlayersSubmissions.length === 0) {
                 showResults(roomData);
             } else {
-                // Schwebendes Voting-Panel einblenden, während man Street View weiter bedienen kann!
                 document.getElementById('voting-panel').style.display = 'block';
                 showNextVoteItem();
             }
