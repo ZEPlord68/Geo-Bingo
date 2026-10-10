@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geo Bingo - Olympische Edition</title>
+    <!-- Google Fonts für antiken Look -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=IM+Fell+English+SC&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --marble-bg: #f9f8f3;
+            --marble-border: #d4af37; /* Gold */
+            --deep-gold: #c59b27;
+            --dark-stone: #2c2c2c;
+            --accent-red: #8b0000;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Roboto', sans-serif;
+            background-color: #1a1a1a;
+            color: var(--dark-stone);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Login / Lobby Screen */
+        #lobby-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('https://images.unsplash.com/photo-1555992336-03a23c7b20ee?auto=format&fit=crop&w=1920&q=80') no-repeat center center/cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .olympic-card {
+            background: var(--marble-bg);
+            border: 4px solid var(--marble-border);
+            border-radius: 8px;
+            padding: 40px;
+            width: 450px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            position: relative;
+        }
+
+        .olympic-card h1 {
+            font-family: 'Cinzel', serif;
+            color: var(--dark-stone);
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .olympic-card p {
+            font-family: 'IM Fell English SC', serif;
+            font-size: 18px;
+            color: #555;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 14px;
+            font-family: 'Cinzel', serif;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--marble-border);
+            border-radius: 4px;
+            background: #fff;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .btn-olympic {
+            background: linear-gradient(to bottom, #d4af37, #aa820a);
+            color: #fff;
+            border: 2px solid #fff;
+            padding: 14px 20px;
+            font-size: 18px;
+            font-family: 'Cinzel', serif;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: 0.2s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .btn-olympic:hover {
+            background: linear-gradient(to bottom, #e6c555, #c59b27);
+            transform: translateY(-2px);
+        }
+
+        /* Main Game Layout (PC Optimized Side-by-Side) */
+        #game-screen {
+            display: none;
+            width: 100vw;
+            height: 100vh;
+            flex-direction: row;
+        }
+
+        /* Left Sidebar */
+        #sidebar {
+            width: 380px;
+            background: var(--marble-bg);
+            border-right: 4px solid var(--marble-border);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 10;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.5);
+        }
+
+        .sidebar-header {
+            text-align: center;
+            border-bottom: 2px solid var(--marble-border);
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+
+        .sidebar-header h2 {
+            font-family: 'Cinzel', serif;
+            margin: 0;
+            font-size: 22px;
+            color: var(--dark-stone);
+        }
+
+        .timer-box {
+            background: #2c2c2c;
+            color: #d4af37;
+            font-family: 'Cinzel', serif;
+            font-size: 28px;
+            font-weight: bold;
+            text-align: center;
+            padding: 10px;
+            border-radius: 4px;
+            border: 2px solid var(--marble-border);
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+
+        .bingo-list-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            padding-right: 5px;
+        }
+
+        .bingo-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #fff;
+            border: 1px solid #ccc;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .bingo-item:hover {
+            border-color: var(--deep-gold);
+            background: #fffdf0;
+        }
+
+        .bingo-item.checked {
+            background: #e8f5e9;
+            border-color: #4caf50;
+            text-decoration: line-through;
+            color: #555;
+        }
+
+        .bingo-item span {
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        /* Right Content Area (StreetView + Minimap Corner) */
+        #content-area {
+            flex-grow: 1;
+            position: relative;
+            height: 100vh;
+        }
+
+        #street-view {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Minimap in Bottom Right Corner */
+        #mini-map {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 280px;
+            height: 200px;
+            border: 3px solid var(--marble-border);
+            border-radius: 6px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            z-index: 5;
+            background: #fff;
+        }
+
+        /* Olympic Torch Flame Icon */
+        .torch-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+            display: inline-block;
+            animation: flicker 1.5s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% { transform: scale(1); opacity: 0.9; }
+            100% { transform: scale(1.1); opacity: 1; filter: drop-shadow(0 0 8px gold); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- LOBBY / SETUP -->
+    <div id="lobby-screen">
+        <div class="olympic-card">
+            <div class="torch-icon">🔥</div>
+            <h1>Geo Bingo</h1>
+            <p>Olympische Edition</p>
+            
+            <div class="input-group">
+                <label for="player-name">Dein Name:</label>
+                <input type="text" id="player-name" placeholder="z.B. Herkules">
+            </div>
+            
+            <div class="input-group">
+                <label for="room-code">Raum-Code:</label>
+                <input type="text" id="room-code" value="Olympia-1">
+            </div>
+
+            <button class="btn-olympic" onclick="startGame()">Wettkampf Starten</button>
+        </div>
+    </div>
+
+    <!-- MAIN GAME SCREEN (PC Layout) -->
+    <div id="game-screen">
+        <!-- Left Sidebar -->
+        <div id="sidebar">
+            <div class="sidebar-header">
+                <div class="torch-icon" style="font-size:18px;">🔥</div>
+                <h2>Such-Liste</h2>
+            </div>
+            
+            <div class="timer-box" id="timer-display">30:00</div>
+
+            <div class="bingo-list-container" id="bingo-list">
+                <!-- Items werden dynamisch geladen -->
+            </div>
+
+            <p style="font-size: 12px; color: #666; text-align: center; margin: 0;">
+                Klicke auf der Liste ein Element an, um deinen Fund am aktuellen StreetView-Standort abzuspeichern!
+            </p>
+        </div>
+
+        <!-- Right StreetView & Minimap -->
+        <div id="content-area">
+            <div id="street-view"></div>
+            <div id="mini-map"></div>
+        </div>
+    </div>
+
+    <!-- Google Maps API (Ersetze YOUR_API_KEY mit deinem echten Google Maps API Schlüssel) -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>
+    
+    <script>
+        let streetViewPanorama;
+        let miniMap;
+        let marker;
+        let gameTimer;
+        let timeLeft = 30 * 60; // 30 Minuten
+
+        const defaultItems = [
+            "Krankenwagen",
+            "Rollstuhlfahrer",
+            "Roter Bus",
+            "Brunnen",
+            "Fahrradfahrer",
+            "Polizeiauto",
+            "Baustelle",
+            "Postauto",
+            "Kreisverkehr"
+        ];
+
+        function startGame() {
+            const name = document.getElementById('player-name').value.trim();
+            if(!name) {
+                alert("Bitte gib deinen Namen ein!");
+                return;
+            }
+
+            document.getElementById('lobby-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'flex';
+
+            initMapAndStreetView();
+            initBingoList();
+            startTimer();
+        }
+
+        function initMapAndStreetView() {
+            // Startpunkt z.B. Berlin / Brandenburger Tor oder frei wählbar
+            const startLocation = { lat: 52.5162, lng: 13.3777 };
+
+            // Große StreetView Ansicht rechts
+            streetViewPanorama = new google.maps.StreetViewPanorama(
+                document.getElementById('street-view'), {
+                    position: startLocation,
+                    pov: { heading: 34, pitch: 10 },
+                    zoomControl: true,
+                    addressControl: true,
+                    fullscreenControl: true
+                }
+            );
+
+            // Kleine Minimap unten rechts
+            miniMap = new google.maps.Map(document.getElementById('mini-map'), {
+                center: startLocation,
+                zoom: 14,
+                streetViewControl: false,
+                mapTypeControl: false
+            });
+
+            // Marker auf der Minimap synchronisieren
+            marker = new google.maps.Marker({
+                position: startLocation,
+                map: miniMap,
+                title: "Dein Standort"
+            });
+
+            streetViewPanorama.addListener('position_changed', function() {
+                const pos = streetViewPanorama.getPosition();
+                miniMap.setCenter(pos);
+                marker.setPosition(pos);
+            });
+
+            // Klick auf Minimap springt zu neuem Ort
+            miniMap.addListener('click', function(mapsMouseEvent) {
+                const clickedPos = mapsMouseEvent.latLng;
+                streetViewPanorama.setPosition(clickedPos);
+            });
+        }
+
+        function initBingoList() {
+            const listContainer = document.getElementById('bingo-list');
+            listContainer.innerHTML = '';
+
+            defaultItems.forEach((itemText, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'bingo-item';
+                itemDiv.innerHTML = `<span>${index + 1}. ${itemText}</span><input type="checkbox" style="pointer-events: none;">`;
+                
+                itemDiv.onclick = function() {
+                    itemDiv.classList.toggle('checked');
+                    const checkbox = itemDiv.querySelector('input');
+                    checkbox.checked = !checkbox.checked;
+                    
+                    if(checkbox.checked) {
+                        const currentPos = streetViewPanorama.getPosition();
+                        console.log(`Fund "${itemText}" gespeichert bei:`, currentPos.lat(), currentPos.lng());
+                    }
+                };
+
+                listContainer.appendChild(itemDiv);
+            });
+        }
+
+        function startTimer() {
+            const display = document.getElementById('timer-display');
+            gameTimer = setInterval(() => {
+                let minutes = Math.floor(timeLeft / 60);
+                let seconds = timeLeft % 60;
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                display.textContent = `${minutes}:${seconds}`;
+
+                if (--timeLeft < 0) {
+                    clearInterval(gameTimer);
+                    alert("Die Zeit ist abgelaufen! Die olympische Runde ist beendet.");
+                }
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
