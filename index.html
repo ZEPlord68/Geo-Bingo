@@ -119,13 +119,14 @@
         .btn-accept { background: var(--accent-green); color: white; border: none; padding: 10px; flex: 1; border-radius: 4px; font-weight: bold; cursor: pointer; font-family: 'Cinzel', serif; }
         .btn-reject { background: var(--accent-red); color: white; border: none; padding: 10px; flex: 1; border-radius: 4px; font-weight: bold; cursor: pointer; font-family: 'Cinzel', serif; }
 
-        /* GÄSTE WARTE-HINWEIS */
+        /* GÄSTE HINWEIS-BOX (ZEIGT AN: SCHAUT IM DISCORD-STREAM) */
         #guest-voting-wait {
-            position: absolute; top: 20px; right: 20px; width: 320px;
+            position: absolute; top: 20px; right: 20px; width: 340px;
             background: var(--marble-bg); border: 4px solid var(--marble-border);
-            border-radius: 8px; padding: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            border-radius: 8px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.8);
             z-index: 100; display: none; text-align: center; font-family: 'Cinzel', serif;
         }
+        #guest-voting-wait h3 { margin-top: 0; color: var(--dark-stone); font-size: 18px; }
 
         /* SIEGEREHRUNG & ÜBERSICHT MODAL */
         .modal-overlay {
@@ -215,7 +216,7 @@
             <div class="timer-box" id="timer-display">01:00</div>
             <div class="bingo-list-container" id="bingo-list"></div>
             
-            <!-- NUR DER HOST KANN DIE RUNDE VORZEITIG BEENDEN -->
+            <!-- DIESER BUTTON WIRD NUR FÜR DEN HOST IM SCRIPT EINGEBLENDED -->
             <button class="btn-olympic btn-stop" id="btn-host-stop" style="display:none;" onclick="finishSearchPhase()">Runde vorzeitig beenden</button>
         </div>
 
@@ -223,7 +224,7 @@
             <div id="street-view"></div>
             <div id="mini-map"></div>
 
-            <!-- SCHWEBENDES SCHIEDSGERICHT (NUR FÜR DEN HOST) -->
+            <!-- SCHWEBENDES SCHIEDSGERICHT (NUR FÜR HOST) -->
             <div id="voting-panel">
                 <h3>🏛️ Host-Schiedsgericht</h3>
                 <p id="vote-info-text" style="font-size:13px; margin:5px 0;">Spieler X hat gefunden:</p>
@@ -235,10 +236,11 @@
                 </div>
             </div>
 
-            <!-- HINWEIS FÜR TEILNEHMER (GÄSTE) -->
+            <!-- Fester HINWEIS FÜR TEILNEHMER (GÄSTE) -->
             <div id="guest-voting-wait">
-                <h3 style="margin-top:0; font-size:16px;">🏛️ Schiedsgericht</h3>
-                <p id="guest-status-text" style="font-size:13px; margin:5px 0;">Schaut in den Discord-Stream des Hosts!</p>
+                <h3>🏛️ Schiedsgericht</h3>
+                <p style="font-size: 14px; color: #444; margin: 10px 0;">Die Suchphase ist beendet!</p>
+                <p style="font-size: 13px; color: var(--accent-red); font-weight: bold;">Schaut jetzt gemeinsam im Discord-Stream des Hosts vorbei, um die Ergebnisse zu prüfen!</p>
             </div>
         </div>
     </div>
@@ -270,9 +272,7 @@
                             <th>Status</th>
                         </tr>
                     </thead>
-                    <tbody id="summary-table-body">
-                        <!-- Wird dynamisch befüllt -->
-                    </tbody>
+                    <tbody id="summary-table-body"></tbody>
                 </table>
             </div>
 
@@ -297,8 +297,6 @@
             "Baustelle", "Postauto", "Kreisverkehr"
         ];
 
-        let allPlayersSubmissions = [];
-        let currentVoteIndex = 0;
         let masterStateKey = "";
 
         function joinRoom() {
@@ -385,13 +383,13 @@
             if (isHost) {
                 document.getElementById('host-start-container').style.display = 'block';
                 document.getElementById('host-item-controls').style.display = 'block';
-                document.getElementById('btn-host-stop').style.display = 'block';
+                document.getElementById('btn-host-stop').style.display = 'block'; // NUR HOST HAT DEN STOPP-BUTTON!
                 document.getElementById('guest-wait-container').style.display = 'none';
                 document.getElementById('room-status-message').textContent = `Raum: ${roomCode} (Du bist Host)`;
             } else {
                 document.getElementById('host-start-container').style.display = 'none';
                 document.getElementById('host-item-controls').style.display = 'none';
-                document.getElementById('btn-host-stop').style.display = 'none';
+                document.getElementById('btn-host-stop').style.display = 'none'; // FÜR GÄSTE KOMPLETT UNSICHTBAR!
                 document.getElementById('guest-wait-container').style.display = 'block';
                 document.getElementById('room-status-message').textContent = `Raum: ${roomCode} - Verbunden!`;
             }
@@ -580,7 +578,6 @@
                 masterStateKey = 'geo_master_state_' + roomCode;
 
                 if (isHost) {
-                    // Host baut die zentrale Master-Liste auf
                     let submissions = [];
                     Object.values(allSubs).forEach(player => {
                         player.submissions.forEach((sub, subIdx) => {
@@ -590,7 +587,7 @@
                                 item: sub.item, 
                                 position: sub.position, 
                                 pov: sub.pov,
-                                status: 'pending' // pending, accepted, rejected
+                                status: 'pending'
                             });
                         });
                     });
@@ -599,7 +596,6 @@
                     localStorage.setItem(masterStateKey, JSON.stringify(initialState));
                     startHostReview(initialState);
                 } else {
-                    // Teilnehmer starten den Live-Zustand-Checker
                     startGuestReview();
                 }
             }
@@ -640,7 +636,7 @@
             updateHostReviewUI(state);
         }
 
-        /* GÄSTE LIVE ZUSCHAUEN & SYNCHRONISIEREN */
+        /* GÄSTE ZUSCHAUEN IM STREAM */
         function startGuestReview() {
             document.getElementById('guest-voting-wait').style.display = 'block';
             statePollTimer = setInterval(pollMasterState, 1000);
@@ -654,14 +650,6 @@
                 clearInterval(statePollTimer);
                 document.getElementById('guest-voting-wait').style.display = 'none';
                 showFinalScoreboard(state.submissions);
-            } else {
-                const sub = state.submissions[state.currentIndex];
-                document.getElementById('guest-status-text').textContent = `Host prüft: ${sub.player} - ${sub.item} (${state.currentIndex + 1}/${state.submissions.length})`;
-
-                if (sub.position && streetViewPanorama) {
-                    streetViewPanorama.setPosition(sub.position);
-                    if (sub.pov) streetViewPanorama.setPov(sub.pov);
-                }
             }
         }
 
@@ -674,7 +662,6 @@
             let lobbyKey = 'geo_lobby_' + roomCode;
             let lobby = JSON.parse(localStorage.getItem(lobbyKey) || '{"players": []}');
 
-            // Punkte berechnen (nur akzeptierte zählen 1 Punkt)
             let scores = {};
             lobby.players.forEach(p => { scores[p] = 0; });
 
@@ -690,7 +677,6 @@
             });
             results.sort((a, b) => b.points - a.points);
 
-            // Podest füllen
             const podiumContainer = document.getElementById('podium-container');
             podiumContainer.innerHTML = '';
             const classes = ['first', 'second', 'third'];
@@ -704,7 +690,6 @@
                 podiumContainer.appendChild(item);
             });
 
-            // Tabelle der Funde füllen
             const tableBody = document.getElementById('summary-table-body');
             tableBody.innerHTML = '';
             submissions.forEach(sub => {
