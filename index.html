@@ -118,7 +118,7 @@
         .vote-actions { display: flex; gap: 10px; margin-top: 15px; }
         .btn-accept { background: var(--accent-green); color: white; border: none; padding: 10px; flex: 1; border-radius: 4px; font-weight: bold; cursor: pointer; font-family: 'Cinzel', serif; }
         .btn-reject { background: var(--accent-red); color: white; border: none; padding: 10px; flex: 1; border-radius: 4px; font-weight: bold; cursor: pointer; font-family: 'Cinzel', serif; }
-        .btn-disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-disabled { opacity: 0.5; cursor: not-allowed; background: #888 !important; }
 
         /* SIEGEREHRUNG MODAL */
         .modal-overlay {
@@ -216,7 +216,7 @@
                 <h3>🏛️ Schiedsgericht</h3>
                 <p id="vote-info-text" style="font-size:13px; margin:5px 0;">Spieler X hat gefunden:</p>
                 <div class="vote-item-display" id="vote-item-name">Gegenstand</div>
-                <p id="vote-status-text" style="font-size:12px; color:#555; margin:0 0 10px 0;">Ihr wurdet exakt zum Fundort teleportiert! Stimmt ab:</p>
+                <p id="vote-status-text" style="font-size:12px; color:#555; margin:0 0 10px 0;">Teleportiert zum Fundort. Stimmt ab:</p>
                 <div class="vote-actions" id="vote-button-box">
                     <button class="btn-accept" id="btn-vote-yes" onclick="castVote(true)">✓ Akzeptieren</button>
                     <button class="btn-reject" id="btn-vote-no" onclick="castVote(false)">✕ Ablehnen</button>
@@ -250,7 +250,7 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCvTgGtBjZacuAbXZ24oUyqOsvJExeQN38&libraries=places"></script>
     
     <script>
-        let streetViewPanorama, miniMap, marker, gameTimer, lobbyPollTimer, votePollTimer;
+        let streetViewPanorama, miniMap, marker, gameTimer, lobbyPollTimer, syncCheckTimer, votePollTimer;
         let targetEndTime = 0;
         let checkedItemsWithData = [];
         let roomCode = "Olympia-1";
@@ -514,43 +514,64 @@
         }
 
         function finishSearchPhase() {
-            // Eigene Ergebnisse ablegen
-            const playerData = { name: playerName, submissions: checkedItemsWithData, points: 0 };
-            let roomResultsKey = 'geo_bingo_results_' + roomCode;
-            let roomData = JSON.parse(localStorage.getItem(roomResultsKey) || '[]');
-            roomData = roomData.filter(p => p.name !== playerName);
-            roomData.push(playerData);
-            localStorage.setItem(roomResultsKey, JSON.stringify(roomData));
+            // Eigene Funde hochladen
+            const playerData = { name: playerName, submissions: checkedItemsWithData };
+            let roomSubKey = 'geo_subs_' + roomCode;
+            let allSubs = JSON.parse(localStorage.getItem(roomSubKey) || '{}');
+            allSubs[playerName] = playerData;
+            localStorage.setItem(roomSubKey, JSON.stringify(allSubs));
 
-            // Vorbereiten der Abstimmung für ALLE Spieler im Raum
-            allPlayersSubmissions = [];
-            roomData.forEach(player => {
-                player.submissions.forEach((sub, subIdx) => {
-                    allPlayersSubmissions.push({ 
-                        id: `${player.name}_${subIdx}`,
-                        player: player.name, 
-                        item: sub.item, 
-                        position: sub.position, 
-                        pov: sub.pov 
+            // Warten, bis ALLE Spieler ihre Funde hochgeladen haben
+            document.getElementById('time-up-overlay').style.display = 'flex';
+            document.querySelector('.notice-card h2').textContent = "Warte auf Mitspieler...";
+            document.querySelector('.notice-card p').textContent = "Sammle alle Funde im Raum ein...";
+            document.getElementById('notice-countdown').parentElement.style.display = 'none';
+
+            syncCheckTimer = setInterval(checkAllPlayersSubmitted, 1500);
+        }
+
+        function checkAllPlayersSubmitted() {
+            let lobbyKey = 'geo_lobby_' + roomCode;
+            let lobby = JSON.parse(localStorage.getItem(lobbyKey) || '{"players": []}');
+            let roomSubKey = 'geo_subs_' + roomCode;
+            let allSubs = JSON.parse(localStorage.getItem(roomSubKey) || '{}');
+
+            const totalPlayers = lobby.players.length || 1;
+            const submittedPlayers = Object.keys(allSubs).length;
+
+            if (submittedPlayers >= totalPlayers) {
+                clearInterval(syncCheckTimer);
+                document.getElementById('time-up-overlay').style.display = 'none';
+
+                // Alle Funde aller Spieler zentral in eine feste gemeinsame Reihenfolge bringen
+                allPlayersSubmissions = [];
+                Object.values(allSubs).forEach(player => {
+                    player.submissions.forEach((sub, subIdx) => {
+                        allPlayersSubmissions.push({ 
+                            id: `${player.name}_${subIdx}_${sub.item}`,
+                            player: player.name, 
+                            item: sub.item, 
+                            position: sub.position, 
+                            pov: sub.pov 
+                        });
                     });
                 });
-            });
 
-            currentVoteIndex = 0;
+                currentVoteIndex = 0;
 
-            if (allPlayersSubmissions.length === 0) {
-                showResults(roomData);
-            } else {
-                document.getElementById('voting-panel').style.display = 'block';
-                setupVoteState();
-                votePollTimer = setInterval(pollVotingProgress, 1000);
+                if (allPlayersSubmissions.length === 0) {
+                    showFinalScoreboard();
+                } else {
+                    document.getElementById('voting-panel').style.display = 'block';
+                    setupVoteState();
+                    votePollTimer = setInterval(pollVotingProgress, 1000);
+                }
             }
         }
 
         function setupVoteState() {
             hasVotedForCurrentItem = false;
             
-            // Buttons aktivieren
             const btnYes = document.getElementById('btn-vote-yes');
             const btnNo = document.getElementById('btn-vote-no');
             btnYes.disabled = false;
@@ -561,9 +582,8 @@
             const sub = allPlayersSubmissions[currentVoteIndex];
             document.getElementById('vote-info-text').textContent = `${sub.player} hat gemeldet (${currentVoteIndex + 1}/${allPlayersSubmissions.length}):`;
             document.getElementById('vote-item-name').textContent = sub.item;
-            document.getElementById('vote-status-text').textContent = "Ihr wurdet exakt zum Fundort teleportiert! Stimmt ab:";
+            document.getElementById('vote-status-text').textContent = "Teleportiert zum Fundort! Stimmt ab:";
 
-            // Teleport
             if (sub.position && streetViewPanorama) {
                 streetViewPanorama.setPosition(sub.position);
                 if (sub.pov) {
@@ -583,7 +603,6 @@
             votes[playerName] = accepted;
             localStorage.setItem(voteStateKey, JSON.stringify(votes));
 
-            // Buttons nach der eigenen Auslesung deaktivieren
             const btnYes = document.getElementById('btn-vote-yes');
             const btnNo = document.getElementById('btn-vote-no');
             btnYes.disabled = true;
@@ -603,46 +622,48 @@
             let lobby = JSON.parse(localStorage.getItem(lobbyKey) || '{"players": []}');
             const totalPlayers = lobby.players.length || 1;
 
-            // Prüfen ob ALLE Spieler ihre Stimme abgegeben haben
             const votesCount = Object.keys(votes).length;
 
             if (votesCount >= totalPlayers) {
-                // Auswertung der Stimmen für dieses Element
+                clearInterval(votePollTimer);
+
+                // Mehrheitsentscheidung berechnen
                 let yesCount = 0;
                 Object.values(votes).forEach(val => { if (val === true) yesCount++; });
 
-                // Mehrheitsentscheidung
                 if (yesCount > (totalPlayers / 2)) {
-                    let roomResultsKey = 'geo_bingo_results_' + roomCode;
-                    let roomData = JSON.parse(localStorage.getItem(roomResultsKey) || '[]');
-                    const targetPlayer = roomData.find(p => p.name === sub.player);
-                    if (targetPlayer) {
-                        targetPlayer.points = (targetPlayer.points || 0) + 1;
-                        localStorage.setItem(roomResultsKey, JSON.stringify(roomData));
-                    }
+                    let scoreKey = `geo_scores_${roomCode}`;
+                    let scores = JSON.parse(localStorage.getItem(scoreKey) || '{}');
+                    scores[sub.player] = (scores[sub.player] || 0) + 1;
+                    localStorage.setItem(scoreKey, JSON.stringify(scores));
                 }
 
-                // Nächstes Element laden
+                // Nächstes Element für alle synchron laden
                 currentVoteIndex++;
                 if (currentVoteIndex < allPlayersSubmissions.length) {
                     setupVoteState();
+                    votePollTimer = setInterval(pollVotingProgress, 1000);
                 } else {
-                    clearInterval(votePollTimer);
                     document.getElementById('voting-panel').style.display = 'none';
-                    let roomResultsKey = 'geo_bingo_results_' + roomCode;
-                    let roomData = JSON.parse(localStorage.getItem(roomResultsKey) || '[]');
-                    showResults(roomData);
+                    showFinalScoreboard();
                 }
             }
         }
 
-        /* SIEGEREHRUNG */
-        function showResults(roomData) {
+        function showFinalScoreboard() {
             document.getElementById('result-modal').style.display = 'flex';
-            if (!roomData || roomData.length === 0) {
-                roomData = [{ name: playerName, points: 0 }];
-            }
-            roomData.sort((a, b) => (b.points || 0) - (a.points || 0));
+            
+            let lobbyKey = 'geo_lobby_' + roomCode;
+            let lobby = JSON.parse(localStorage.getItem(lobbyKey) || '{"players": []}');
+            let scoreKey = `geo_scores_${roomCode}`;
+            let scores = JSON.parse(localStorage.getItem(scoreKey) || '{}');
+
+            let results = [];
+            lobby.players.forEach(p => {
+                results.push({ name: p, points: scores[p] || 0 });
+            });
+
+            results.sort((a, b) => b.points - a.points);
 
             const podiumContainer = document.getElementById('podium-container');
             podiumContainer.innerHTML = '';
@@ -650,11 +671,11 @@
             const classes = ['first', 'second', 'third'];
             const medals = ['🥇 1. Platz', '🥈 2. Platz', '🥉 3. Platz'];
 
-            roomData.forEach((player, index) => {
+            results.forEach((player, index) => {
                 const item = document.createElement('li');
                 item.className = `podium-item ${classes[index] || ''}`;
                 const medalText = medals[index] || `${index + 1}. Platz`;
-                item.innerHTML = `<span>${medalText} - ${player.name}</span> <span>${player.points || 0} Pt.</span>`;
+                item.innerHTML = `<span>${medalText} - ${player.name}</span> <span>${player.points} Pt.</span>`;
                 podiumContainer.appendChild(item);
             });
         }
